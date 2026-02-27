@@ -24,7 +24,7 @@ This bot utilizes Discord's global and guild (server) specific slash commands al
 NOTE: global commands are available to every server and cannot be disabled, while guild commands are only available to the server they are registered to and can be enabled and disabled as needed.
 
 ---
-<h2 align="center">CONTRIBUTIONS</h2>
+<h2 align="center">---{CONTRIBUTIONS}---</h2>
 
 As explained under License, contributions are allowed only when given explicit permisions.
 
