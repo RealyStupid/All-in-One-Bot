@@ -9,7 +9,7 @@ Utilizing the sync engine found in the [Everything Bot](https://github.com/Realy
 
 <h2 align="center">---{LICENSE}---</h2>
 
-The owner of this repository has licensed this under: All Rights Reserved. None are allowed to edit, fork, duplicate, remake all files, documents, and assets relating to this project.<br>
+The owner of this repository has licensed this under: All Rights Reserved. None are allowed to edit, fork, duplicate, remakeing files, documents, and assets relating to this project.<br>
 Although viewing, contributing with permision, and giving feedback is allowed.
 
 ---
