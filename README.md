@@ -21,6 +21,8 @@ This repository is only made to show the progress of the bot and to allow for fe
 
 This bot utilizes Discord's global and guild (server) specific slash commands along with the Sync Engine to allow for a more customizable bot.
 
+This bot wraps commands into "modules" that can be enabled and disabled as needed. This means that commands can be desynced to hide them from the command list, and synced to show them again. This allows for a more customizable bot that can be tailored to the needs of the user(s) server.
+
 NOTE: global commands are available to every server and cannot be disabled, while guild commands are only available to the server they are registered to and can be enabled and disabled as needed.
 
 ---
