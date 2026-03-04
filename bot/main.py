@@ -30,7 +30,7 @@ class Client(commands.Bot):
     async def setup_hook(self):
         print("[SETTING UP BOT] The bot starting setting up everything before logging in")
 
-        await db.init_data(path="utilities\\db_manager\\data\\guild_cache.db", new_instance=False)
+        await db.init_data(path="utilities\\db_manager\\data\\guild_cache.db", new_instance=True)
 
         await self.load_all_cogs("Cogs")
 
