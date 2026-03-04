@@ -6,5 +6,4 @@ __all__ = [
     "discord",
     "commands",
     "app_commands",
-    "register_command",
 ]
