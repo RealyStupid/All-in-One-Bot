@@ -9,10 +9,6 @@ __all__ = [
     "discord",
     "commands",
     "app_commands",
-<<<<<<< Updated upstream
-    "register_command",
-=======
     "create_group",
     "module",
->>>>>>> Stashed changes
 ]
