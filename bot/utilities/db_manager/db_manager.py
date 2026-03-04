@@ -35,14 +35,13 @@ async def init_data(*, path: str = None, new_instance: bool = False):
     DB_PATH = path
 
     await guild_data_init()
+    await module_init()
     print("[DB MANAGER] Database manager initialized successfully with path:", DB_PATH)
 
 # Guild data management
 # This handles creating the .db file and the guild_data table,
 # It also includes functions change data and add new guilds.
 async def guild_data_init():
-    global DB_PATH
-
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             """
@@ -61,7 +60,6 @@ async def guild_data_init():
 
 # Setting and removing guilds
 async def register_guild(guild_id: int):
-    global DB_PATH
     print("[DB MANAGER] Registering guild with ID:", guild_id, f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("INSERT OR IGNORE INTO guild_data (guild_id) VALUES (?)", (guild_id,))
@@ -70,7 +68,6 @@ async def register_guild(guild_id: int):
     await refresh_guild_ids()
 
 async def unregister_guild(guild_id: int):
-    global DB_PATH
     print("[DB MANAGER] Unregistering guild with ID:", guild_id, f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("DELETE FROM guild_data WHERE guild_id = ?", (guild_id,))
@@ -80,21 +77,18 @@ async def unregister_guild(guild_id: int):
 
 # Some server specific settings
 async def set_prefix(guild_id: int, prefix: str):
-    global DB_PATH
     print(f"[DB MANAGER] Setting prefix for guild {guild_id} to '{prefix}'", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("UPDATE guild_data SET prefix = ? WHERE guild_id = ?", (prefix, guild_id))
         await db.commit()
 
 async def reset_prefix(guild_id: int):
-    global DB_PATH
     print(f"[DB MANAGER] Resetting prefix for guild {guild_id} to default '!'", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("UPDATE guild_data SET prefix = '!' WHERE guild_id = ?", (guild_id,))
         await db.commit()
 
 async def get_prefix(guild_id: int) -> str:
-    global DB_PATH
     print(f"[DB MANAGER] Getting prefix for guild {guild_id}", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         cursor = await db.execute("SELECT prefix FROM guild_data WHERE guild_id = ?", (guild_id,))
@@ -103,21 +97,18 @@ async def get_prefix(guild_id: int) -> str:
 
 # Setting and remove welcome channels
 async def set_welcome_channel(guild_id: int, channel_id: int):
-    global DB_PATH
     print(f"[DB MANAGER] Setting welcome channel for guild {guild_id} to channel ID {channel_id}", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("UPDATE guild_data SET welcome_channel_id = ? WHERE guild_id = ?", (channel_id, guild_id))
         await db.commit()
 
 async def remove_welcome_channel(guild_id: int):
-    global DB_PATH
     print(f"[DB MANAGER] Removing welcome channel for guild {guild_id}", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("UPDATE guild_data SET welcome_channel_id = NULL WHERE guild_id = ?", (guild_id,))
         await db.commit()
 
 async def get_welcome_channel(guild_id: int) -> int | None:
-    global DB_PATH
     print(f"[DB MANAGER] Getting welcome channel for guild {guild_id}", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         cursor = await db.execute("SELECT welcome_channel_id FROM guild_data WHERE guild_id = ?", (guild_id,))
@@ -126,21 +117,18 @@ async def get_welcome_channel(guild_id: int) -> int | None:
 
 # Setting welcome and leave messages
 async def set_welcome_message(guild_id: int, message: str):
-    global DB_PATH
     print(f"[DB MANAGER] Setting welcome message for guild {guild_id} message: {message}", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("UPDATE guild_data SET welcome_message = ? WHERE guild_id = ?", (message, guild_id))
         await db.commit()
 
 async def set_leave_message(guild_id: int, message: str):
-    global DB_PATH
     print(f"[DB MANAGER] Setting leave message for guild {guild_id} message: {message}", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("UPDATE guild_data SET leave_message = ? WHERE guild_id = ?", (message, guild_id))
         await db.commit()
 
 async def get_welcome_message(guild_id: int) -> str | None:
-    global DB_PATH
     print(f"[DB MANAGER] Getting welcome message for guild {guild_id}", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         cursor = await db.execute("SELECT welcome_message FROM guild_data WHERE guild_id = ?", (guild_id,))
@@ -148,7 +136,6 @@ async def get_welcome_message(guild_id: int) -> str | None:
         return row[0] if row and row[0] is not None else None
 
 async def get_leave_message(guild_id: int) -> str | None:
-    global DB_PATH
     print(f"[DB MANAGER] Getting leave message for guild {guild_id}", f"\nCaller info:\n", print_caller_info())
     async with aiosqlite.connect(DB_PATH) as db:
         cursor = await db.execute("SELECT leave_message FROM guild_data WHERE guild_id = ?", (guild_id,))
@@ -158,8 +145,6 @@ async def get_leave_message(guild_id: int) -> str | None:
 # Module management
 # This is for storing module specific data, such as whether a module is enabled or not.
 async def module_init():
-    global DB_PATH
-
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("""
             CREATE TABLE IF NOT EXISTS guild_modules (
