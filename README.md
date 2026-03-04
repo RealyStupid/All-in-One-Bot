@@ -25,16 +25,31 @@ This bot wraps commands into "modules" that can be enabled and disabled as neede
 
 NOTE: global commands are available to every server and cannot be disabled, while guild commands are only available to the server they are registered to and can be enabled and disabled as needed.
 
+## global commands:
+
+**Module Commands**
+- `/module enable <module>`: enables a module and all its commands
+- `/module disable <module>`: disables a module and all its commands
+- `/module list`: lists all modules
+- `/module enabled`: lists all enabled modules
+- `/module info <module>`: shows information about a module
+							
+**Customization Commands**
+- `/customization prefix <prefix>`: changes the bot's prefix for the server
+- `/customization nickname <nickname>`: changes the bot's nickname for the server
+
 ---
 <h2 align="center">---{CONTRIBUTIONS}---</h2>
 
 As explained under License, contributions are allowed only when given explicit permisions.
 
+#### But reading and giving feedback is allowed for everyone, so if you have any suggestions or feedback, please feel free to share it with us.
+
 To gain permision, go to discord and contact: **therealrealystupid**.
 
 Information needed before granted permisions:
 - your github profile
-- your most notible repo
+- your most noteable repo
 - your skills
 - what you will contribute to this project
 - for how long do you plan to stay a contributor with us
