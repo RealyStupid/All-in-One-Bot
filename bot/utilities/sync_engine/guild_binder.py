@@ -1,11 +1,10 @@
-import discord
-from discord import guild
+﻿import discord
 from discord.ext import commands
 from discord import app_commands
 
 from utilities.db_manager.db_manager import GUILD_IDS, get_enabled_modules_for_guild
-
 from utilities.sync_engine.custom_group import REGISTERED_GROUPS
+
 
 async def rebuild_commands_for_guild(bot: commands.Bot, guild_id: int):
     tree: app_commands.CommandTree = bot.tree
@@ -15,11 +14,12 @@ async def rebuild_commands_for_guild(bot: commands.Bot, guild_id: int):
 
     commands_for_guild: list[app_commands.Command | app_commands.Group] = []
 
-
-    # handleing normal commands
-
+    # ---------------------------------------------------------
+    # 1) NORMAL COMMANDS (leaf commands)
+    # ---------------------------------------------------------
     for command in tree.walk_commands():
-        # skip groups
+
+        # Skip groups — handled separately
         if isinstance(command, app_commands.Group):
             continue
 
@@ -27,15 +27,24 @@ async def rebuild_commands_for_guild(bot: commands.Bot, guild_id: int):
         if callback is None:
             continue
 
+        # GLOBAL COMMANDS HAVE NO MODULE
         module_name = getattr(callback, "__module_name__", None)
-        
-        if module_name and module_name not in enabled_modules:
+
+        # Skip global commands (they stay global)
+        if module_name is None:
+            continue
+
+        # Skip commands whose module is disabled
+        if module_name not in enabled_modules:
             continue
 
         commands_for_guild.append(command)
 
-    # handleing groups
+    # ---------------------------------------------------------
+    # 2) CUSTOM GROUPS (from REGISTERED_GROUPS)
+    # ---------------------------------------------------------
     for group in REGISTERED_GROUPS:
+
         allowed_subcommands: list[app_commands.Command] = []
 
         for sub in group.commands:
@@ -45,17 +54,62 @@ async def rebuild_commands_for_guild(bot: commands.Bot, guild_id: int):
 
             module_name = getattr(callback, "__module_name__", None)
 
-            if module_name and module_name not in enabled_modules:
+            # Skip global subcommands
+            if module_name is None:
                 continue
 
-            allowed_subcommands.append(group)
+            # Skip disabled modules
+            if module_name not in enabled_modules:
+                continue
 
-    #clearing all guild specific commands for that guild
+            allowed_subcommands.append(sub)
+
+        # If no subcommands allowed → skip entire group
+        if not allowed_subcommands:
+            continue
+
+        # Rebuild the group fresh for this guild
+        new_group = app_commands.Group(
+            name=group.name,
+            description=group.description
+        )
+
+        for sub in allowed_subcommands:
+            new_group.add_command(sub)
+
+        commands_for_guild.append(new_group)
+
+    # ---------------------------------------------------------
+    # 3) CLEAR & RE-ADD COMMANDS FOR THIS GUILD
+    # ---------------------------------------------------------
     tree.clear_commands(guild=guild_obj)
 
-    #reading commands
     for cmd in commands_for_guild:
         tree.add_command(cmd, guild=guild_obj)
 
-    name = [cmd.qualified_name for cmd in commands_for_guild]
-    print(f"[SYNC ENGINE] Rebuilt commands for guild {guild_id}: {len(commands_for_guild)} commands -> {name}")
+    names = [cmd.qualified_name for cmd in commands_for_guild]
+    print(f"[SYNC ENGINE] Rebuilt commands for guild {guild_id}: {len(commands_for_guild)} commands -> {names}")
+
+
+async def sync_guild(bot: commands.Bot, guild_id: int):
+    await rebuild_commands_for_guild(bot, guild_id)
+    guild_obj = discord.Object(id=guild_id)
+    synced = await bot.tree.sync(guild=guild_obj)
+    print(f"[SYNC ENGINE] Synced guild {guild_id}: {len(synced)} commands.")
+    return synced
+
+
+async def sync_all_registered_guilds(bot: commands.Bot):
+    total = 0
+    for gid in GUILD_IDS:
+        synced = await sync_guild(bot, gid)
+        total += len(synced)
+
+    print(f"[SYNC ENGINE] Finished syncing all registered guilds. Total commands synced: {total}")
+    return total
+
+
+async def unsync_guild(bot, guild_id: int):
+    guild = bot.get_guild(guild_id)
+    if guild:
+        await bot.tree.sync(guild=guild)

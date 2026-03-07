@@ -30,7 +30,8 @@ class Client(commands.Bot):
     async def setup_hook(self):
         print("[SETTING UP BOT] The bot starting setting up everything before logging in")
 
-        await db.init_data(path="utilities\\db_manager\\data\\guild_cache.db", new_instance=True)
+        # For commertial use please turn new_instance off
+        await db.init_data(path="utilities\\db_manager\\data\\guild_cache.db", new_instance=False)
 
         await self.load_all_cogs("Cogs")
 
@@ -47,7 +48,7 @@ class Client(commands.Bot):
                     module = f"Cogs.{relative[:-3].replace('/', '.')}"
 
                     await self.load_extension(module)
-                    print(f"Loaded cog: {module}")
+                    print(f"[COG LOADER] Loaded cog {module}")
 
     async def on_ready(self):
         print("----------------------------------------------------------------------------------------\n"
@@ -56,7 +57,7 @@ class Client(commands.Bot):
 
 bot = Client()
 
-# temporary syncing system, will be replaced sync engine in the future
+'''# temporary syncing system,has already been replaced by the sync engine but if anything breaks this will be used
 @bot.command(name="sync", description="Syncs the bot's commands with Discord. (Admin only)")
 @commands.has_permissions(administrator=True)
 async def sync(ctx, type: str = None):
@@ -69,27 +70,15 @@ async def sync(ctx, type: str = None):
             print(f"Failed to sync global commands: {e}")
     
     elif type == None or type == "guilds":
+        total = 0
         for guild_id in db.GUILD_IDS:
-            total = 0
             try:
                 synced = await bot.tree.sync(guild=discord.Object(id=guild_id))
                 total += len(synced)
             except Exception as e:
                 print(f"Failed to sync commands for guild {guild_id}: {e}")
 
-    await ctx.send(f"Synced {total} commands across {len(db.GUILD_IDS)} guilds!")
+        await ctx.send(f"Synced {total} commands across {len(db.GUILD_IDS)} guilds!")'''
 
-@bot.command(name="register", description="Registers the current guild in the database. (Admin only)")
-@commands.has_permissions(administrator=True)
-async def register(ctx):
-    await db.register_guild(ctx.guild.id)
-    await ctx.send("Guild registered in the database!")
-
-@bot.event
-async def on_guild_join(guild):
-    await db.register_guild(guild.id)
-    print(f"Registered guild {guild.id} in the database")
-
-    await sync(type="guilds")
 
 bot.run(BOT_TOKEN)

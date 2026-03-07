@@ -9,11 +9,13 @@ class Customization(commands.Cog):
     customization = app_commands.Group(name="customization", description="Commands for customizing the bot's appearance.")
 
     @customization.command(name="prefix", description="Set the bot's prefix wanting to be used")
+    @commands.has_permissions(administrator=True)
     async def set_prefix(self, interaction: discord.Interaction, prefix: str):
         await db.set_prefix(interaction.guild_id, prefix)
         await interaction.response.send_message(f"Prefix set to: {prefix}")
 
     @customization.command(name="nickname", description="Set the bot's nickname in this server")
+    @commands.has_permissions(administrator=True)
     async def set_nickname(self, interaction: discord.Interaction, nickname: str):
         try:
             await interaction.guild.me.edit(nick=nickname)

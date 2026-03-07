@@ -3,7 +3,7 @@
 ## This is a bot made by [RealyStupid](https://github.com/RealyStupid).
 This bot aims to encapsulate all the features that a bot can have, and make it easy to use for everyone.
 
-Utilizing the sync engine found in the [Everything Bot](https://github.com/RealyStupid/Everything-Bot), this bot will contain "groups" of commands within modules that can be enabled and disabled as needed. This allows for a more customizable bot then can be tailored to the needs of the user(s) server.
+Utilizing an updated, more stable version of the sync engine found in the [Everything Bot](https://github.com/RealyStupid/Everything-Bot), this bot will contain "groups" of commands within modules that can be enabled and disabled as needed. This allows for a more customizable bot then can be tailored to the needs of the user(s) server.
 
 ---
 
@@ -23,8 +23,7 @@ This bot utilizes Discord's global and guild (server) specific slash commands al
 
 This bot wraps commands into "modules" that can be enabled and disabled as needed. This means that commands can be desynced to hide them from the command list, and synced to show them again. This allows for a more customizable bot that can be tailored to the needs of the user(s) server.
 
-NOTE: global commands are available to every server and cannot be disabled, while guild commands are only available to the server they are registered to and can be enabled and disabled as needed.
-
+**Where this version deviates from the Everything Bot:** This sync engine is a much more stable, expandable version allowing me to easly add commands in the same manor as how regular commands are made.
 ## global commands:
 
 **Module Commands**
@@ -32,7 +31,6 @@ NOTE: global commands are available to every server and cannot be disabled, whil
 - `/module disable <module>`: disables a module and all its commands
 - `/module list`: lists all modules
 - `/module enabled`: lists all enabled modules
-- `/module info <module>`: shows information about a module
 							
 **Customization Commands**
 - `/customization prefix <prefix>`: changes the bot's prefix for the server
