@@ -221,7 +221,7 @@ Command not found?
 Here’s how a command travels through the system:
 ### 1. Definition Layer
 Developer writes:
-```
+```Python
 @group.command(...)
 @module(...)
 async def callback(...):
@@ -235,6 +235,47 @@ The decorator stores the definition in:
 
 ### 3. Execution Layer
 At startup:
+```Python
+await register_global_commands(bot)
 ```
 
+### 4. Sync Layer
+Developer runs:
+```
+!sync global
+```
+or
+```
+!sync guild
+```
+to push it to discord.
+
+### 5. Execution
+User runs /(command synced)
+
+Discord sends interaction -> Discord.py -> your callback.
+
+---
+## 13. Creating a New Command (Full Example)
+```Python
+from utilities.custom_command_api import Group, module
+import discord
+
+admin = Group("admin", "Admin tools")
+
+@admin.command("announce", "Send an announcement")
+@module("moderation")
+async def announce(interaction, message: str):
+    await interaction.response.send_message(f"Announcement: {message}")
+```
+---
+## 14. Creating a New Group
+```Python
+fun = Group("fun", "Fun commands")
+
+@fun.command("roll", "Roll a dice")
+@module("fun")
+async def roll(interaction, sides: int = 6):
+    import random
+    await interaction.response.send_message(f"You rolled {random.randint(1, sides)}!")
 ```
