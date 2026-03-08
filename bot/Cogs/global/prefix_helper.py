@@ -1,12 +1,13 @@
 ﻿import discord
 from discord.ext import commands
 
+
 class CommandList(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="commands", aliases=["cmds", "helpme"])
-    async def list_prefix_commands(self, ctx):
+    async def list_prefix_commands(self, ctx: commands.Context):
         """
         Shows all prefix commands loaded in the bot.
         """
@@ -23,7 +24,9 @@ class CommandList(commands.Cog):
             if cmd.signature:
                 signature += f" {cmd.signature}"
 
-            commands_list.append(f"**{signature}**: {cmd.help or 'No description'}")
+            commands_list.append(
+                f"**{signature}** — {cmd.help or 'No description'}"
+            )
 
         # Sort alphabetically
         commands_list.sort()
@@ -36,6 +39,7 @@ class CommandList(commands.Cog):
         )
 
         await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(CommandList(bot))

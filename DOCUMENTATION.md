@@ -19,7 +19,8 @@ This system is composed of:
 
 | Component | Perpose |
 |-----------|---------|
-| Groups | Defines a slash command group (e.g, `/module`)
+| Groups | Defines a slash command group (e.g, `/group subcommand`)
+| Slashs | Defines slash commands (e.g, `/command`)
 | `@module()` | Assigns a module or marks a command as global
 | Registry | Stores all commands & group definitions
 | Builder | Converts definitions -> Discord app commands
@@ -28,7 +29,7 @@ This system is composed of:
 ---
 ## 2. Command Definition Basics
 Slash commands are defined at module level, not inside Cogs.
-Example:
+Group commands example
 ```Python
 from utilities.custom_command_api import Group, module
 
@@ -40,11 +41,21 @@ async def ping(interaction):
     await interaction.response.send_message("Pong!")
 ```
 
+slash command example:
+```Python
+from utilities import slash, module
+
+@slash.command("hello", "Say hello")
+@module("fun")
+async def hello(interaction):
+    await interaction.response.send_message("Hello!")
+```
+
 Key Rules:
 - Commands must not be inside a Cog class
 - Commands must not use Discord.py decorators
 - Commands must be defined at module level
-- Commands must use `@module()` to specify their module
+- Commands must use `@module()` to specify their module. This is because the API is specifically made for this bots needs.
 - Groups are not Discord objects, they are definitions
 ---
 ## 3. Global Commands
@@ -65,8 +76,8 @@ Global commands:
 - Always appear in every guild
 - Must be registered by the execution manager at startup
 ---
-## 4. Groups
-Groups are created like this:
+## 4. Groups and slash commands
+### Groups are created like this:
 ```Python
 settings = Group("settings", "bot setting")
 ```
@@ -83,6 +94,16 @@ Example:
 async def set_prefix(interaction, prefix: str):
     ...
 ```
+### Slash commands are created like this:
+```Python
+@slash.command("name", "description")
+```
+Slash:
+much like groups, slash commands:
+- Are NOT Discord objects
+- Are stored in the registry
+- Are built dynamically by the sync engine
+
 ---
 ## 5. Modules
 Modules allow commands to be enabled/disabled per guild.
@@ -134,11 +155,13 @@ enable_module.__autocomplete__ = {
 ---
 ## 7. Registry Structure
 The registry stores:
-- GLOBAL_COMMAND_DEFS
-- MODULE_COMMAND_DEFS
-- GROUP_DEFS
+- `GLOBAL_COMMAND_DEFS`
+- `MODULE_COMMAND_DEFS`
+- ``GROUP_DEFS``
+- ``STANDALONE_GLOBAL_COMMAND_DEFS``
+- ``STANDALONE_MODULE_COMMAND_DEFS``
 
-- Each definition contains:
+Each definition contains:
 - name
 - description
 - callback
@@ -146,6 +169,7 @@ The registry stores:
 - autocomplete
 - parameters
 This allows the sync engine to rebuild commands dynamically.
+
 ---
 ## 8. Builder System
 The builder converts definitions -> Discord commands.
@@ -182,14 +206,16 @@ Called in main.py after cogs load.
 The sync engine handles:
 
 Per‑guild sync
-sync_guild(bot, guild_id)
+
+``sync_guild(bot, guild_id)``
 - Clears guild commands
 - Builds commands based on enabled modules
 - Adds them to the tree
 - Syncs them
 
 Global sync
-sync_global(bot)
+
+``sync_global(bot)``
 - Clears global commands
 - Builds global commands
 - Adds them to the tree
@@ -201,37 +227,39 @@ Otherwise commands exist on Discord but cannot execute.
 ---
 ## 11. Debugging Guide
 
-Command not found?
+### Command not found?
 - Execution manager not run
 - Registry empty at startup
 - Global commands not registered
 - Sync not run after changes
 
-- Autocomplete not working?
+### Autocomplete not working?
 - Missing `__autocomplete__`
 - Parameter name mismatch
 - Sync not run
 
-- Group not appearing?
+### Group not appearing?
 - No allowed subcommands
 - Module disabled
 - Registry not populated
+
 ---
-## 12. Full Command Lifecycle
-Here’s how a command travels through the system:
+## 13. Full Command Lifecycle
 ### 1. Definition Layer
+
 Developer writes:
 ```Python
 @group.command(...)
+@slash.command(...)
 @module(...)
 async def callback(...):
 ```
 
 ### 2. Registry Layer
 The decorator stores the definition in:
-- GLOBAL_COMMAND_DEFS
-- MODULE_COMMAND_DEFS
-- GROUP_DEFS
+- Standalone lists
+- Group lists
+- Module lists
 
 ### 3. Execution Layer
 At startup:
@@ -244,33 +272,23 @@ Developer runs:
 ```
 !sync global
 ```
+
 or
 ```
 !sync guild
 ```
-to push it to discord.
 
 ### 5. Execution
-User runs /(command synced)
+User runs `/command`
 
-Discord sends interaction -> Discord.py -> your callback.
+Discord → Discord.py → your callback.
 
 ---
-## 13. Creating a New Command (Full Example)
+## 13. Creating a New Group Command
 ```Python
-from utilities.custom_command_api import Group, module
+from utilities import Group, module
 import discord
 
-admin = Group("admin", "Admin tools")
-
-@admin.command("announce", "Send an announcement")
-@module("moderation")
-async def announce(interaction, message: str):
-    await interaction.response.send_message(f"Announcement: {message}")
-```
----
-## 14. Creating a New Group
-```Python
 fun = Group("fun", "Fun commands")
 
 @fun.command("roll", "Roll a dice")
@@ -278,4 +296,25 @@ fun = Group("fun", "Fun commands")
 async def roll(interaction, sides: int = 6):
     import random
     await interaction.response.send_message(f"You rolled {random.randint(1, sides)}!")
+```
+---
+## 14. Creating a New Standalone Command
+```Python
+from utilities import slash, module
+import discord
+
+@slash.command("hello", "Say hello")
+@module("fun")
+async def hello(interaction):
+    await interaction.response.send_message("Hello!")
+```
+---
+## 15. Parmisions
+you can limit the use of a command to only the owner of the bot **OR** to the Guild owner
+
+We use a brand new decorator `@owner_only()`
+
+### syntax
+```Python
+@owner_only(allow_guild_owner: bool = False, allow: list[int] = None)
 ```
