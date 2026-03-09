@@ -8,7 +8,7 @@ from utilities.custom_command_api.slash import slash
 
 import utilities.db_manager.db_manager as db
 from utilities.custom_command_api.permition import owner_only
-
+from utilities.custom_command_api.autocomplete import autocomplete
 __all__ = [
     "discord",
     "commands",
@@ -18,4 +18,5 @@ __all__ = [
     "slash",
     "owner_only",
     "db",
+    "autocomplete"
 ]

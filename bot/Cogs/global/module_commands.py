@@ -43,7 +43,7 @@ async def autocomplete_disable_modules(interaction: discord.Interaction, current
 # ---------------------------------------------------------
 @module_group.command("list", "List all modules")
 @owner_only(allow_guild_owner=True)
-@module(None)  # <-- GLOBAL COMMAND
+@module(None)
 async def list_modules(interaction: discord.Interaction):
     all_modules = [m.value for m in ModuleEnum]
 
@@ -78,6 +78,7 @@ async def enabled_modules(interaction: discord.Interaction):
 
 @module_group.command("enable", "Enable a module")
 @owner_only(allow_guild_owner=True)
+@autocomplete(module_name=autocomplete_enable_modules)
 @module(None)
 async def enable_module(interaction: discord.Interaction, module_name: str):
     guild_id = interaction.guild_id
@@ -96,14 +97,10 @@ async def enable_module(interaction: discord.Interaction, module_name: str):
         f"Module `{module_name}` has been enabled and commands synced."
     )
 
-# Attach autocomplete
-enable_module.__autocomplete__ = {
-    "module_name": autocomplete_enable_modules
-}
-
 
 @module_group.command("disable", "Disable a module")
 @owner_only(allow_guild_owner=True)
+@autocomplete(module_name=autocomplete_disable_modules)
 @module(None)
 async def disable_module(interaction: discord.Interaction, module_name: str):
     guild_id = interaction.guild_id
@@ -121,11 +118,6 @@ async def disable_module(interaction: discord.Interaction, module_name: str):
     await interaction.followup.send(
         f"Module `{module_name}` has been disabled and commands synced."
     )
-
-# Attach autocomplete
-disable_module.__autocomplete__ = {
-    "module_name": autocomplete_disable_modules
-}
 
 # ---------------------------------------------------------
 # COG (PREFIX COMMANDS OR LISTENERS ONLY)

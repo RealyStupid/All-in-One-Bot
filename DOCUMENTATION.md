@@ -318,3 +318,23 @@ We use a brand new decorator `@owner_only()`
 ```Python
 @owner_only(allow_guild_owner: bool = False, allow: list[int] = None)
 ```
+
+`Allow_guild_owner`
+
+you can set if the owner of a guild is allowed to use this command.
+
+`allow`
+
+set specific user ids to be allowed to use this command
+
+---
+## 15. Autocomplete
+allows to set a "choice" system
+
+NOTE: will be changed in the future.
+
+```Python
+@autocomplete(**mapping)
+```
+
+works exactly like in discord.py
