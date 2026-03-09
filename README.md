@@ -83,10 +83,7 @@ This architecture is designed for **scalability**, **maintainability**, and **fu
 
 <h2 align="center">---{LICENSE}---</h2>
 
-The owner of this repository has licensed this under: **All Rights Reserved**.  
-None are allowed to edit, fork, duplicate, or remake files, documents, and assets relating to this project.
-
-Viewing, contributing *with permission*, and giving feedback is allowed.
+this project is free for anyone to review and edit. But you cannot host this for your own bot or gain.
 
 ---
 
